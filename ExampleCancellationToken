@@ -1,0 +1,27 @@
+public class ExampleCancellationToken
+{
+    public static void Main()
+    {
+        CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
+        CancellationToken token = cancelTokenSource.Token;
+
+        var task = Task.Run(() =>
+        {
+            for (int i = 1; i < 1000000; i++)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    Console.WriteLine("Операция прервана");
+                    return;
+                }
+                Console.WriteLine($"Число {i}");
+                Thread.Sleep(100);
+            }
+        }, token);
+        Thread.Sleep(2000);        
+        cancelTokenSource.Cancel();        
+        Thread.Sleep(1000);        
+        Console.WriteLine($"Task Status: {task.Status}");
+        cancelTokenSource.Dispose();
+    }
+}
